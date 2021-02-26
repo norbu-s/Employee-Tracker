@@ -10,6 +10,8 @@ const connection = mysql.createConnection({
   database: 'employeedb',
 });
 
+
+
 connection.connect((err) => {
     if (err) throw err;
     console.log(`connected as id ${connection.threadId}`);
