@@ -1,0 +1,29 @@
+{
+  "name": "tracker",
+  "version": "1.0.0",
+  "description": "employee tracking app",
+  "main": "nodemon server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/norbu-s/Employee-Tracker.git"
+  },
+  "keywords": [
+    "et"
+  ],
+  "author": "Norbu",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/norbu-s/Employee-Tracker/issues"
+  },
+  "homepage": "https://github.com/norbu-s/Employee-Tracker#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "i": "^0.3.6",
+    "inquirer": "^8.0.0",
+    "nodemon": "^2.0.7",
+    "npm": "^7.6.0"
+  }
+}
