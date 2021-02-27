@@ -1,3 +1,5 @@
+Drop database if exists employeedb;
+
 create database employeedb;
 
 create table department (
@@ -13,6 +15,7 @@ create table role(
 	salary decimal(10,2) not null,
 	department_id INT not null,
     Primary key (id)
+    foreign key (department_id) references department(id)
     );
 
 create table employee (
@@ -22,5 +25,12 @@ create table employee (
     role_id int not null,
     manager_id int null,
     Primary key (id)
+    Foreign key(role_id),
+    FOREIGN KEY(manager_id) REFERENCES employee(id)
     );
+
+Select * from department;
+Select * from role;
+Select * from employee;
+
 

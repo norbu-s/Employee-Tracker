@@ -69,21 +69,21 @@ const addDepartment = () => {
         type: "input",
         message: "What is the name of the new department?"
         },
-    ]).then((answer))
-    const query = connection.query(
-        'INSERT INTO department SET ?',
-        {
-        id:id,
-        name: `${answer.newDepartment}`
-        },
-        (err, res) => {
-            if (err) throw err;
-            console.log(`${res.affectedRows} new Department created!\n`);
-            updateProduct();
-        }
-      );
+    ]).then((answer) => {
+        const query = connection.query(
+            'INSERT INTO department SET ?',
+            {
+            id:id,
+            name: `${answer.newDepartment}`
+            },
+            (err, res) => {
+                if (err) throw err;
+                console.log(`${res.affectedRows} new Department created!\n`);
+                updateProduct();
+            }
+    )});
       console.log('-----------------------------------');
-    }
+}
 
 // function add roles
 const addRole = () => {
@@ -114,9 +114,7 @@ const addRole = () => {
         "5 = Back Office"
     ],
 }
-])
-    .then((answer))
-    const query = connection.query(
+]).then((answer) => {const query = connection.query(
         'INSERT INTO role SET ?',
         {
         id: id,
@@ -130,9 +128,10 @@ const addRole = () => {
             console.log(`${res.affectedRows} new Role created!\n`);
             updateRole();
         }
-      );
+        )});
       console.log('-----------------------------------');
     }
+    
 
 // //function to add employees
 const addEmployee = () => {
@@ -179,9 +178,27 @@ const addEmployee = () => {
         "5 = Back Office Manger"
         ]
 },
-])
-    .then((answer))
-    const query = connection.query(
+]).then((answer) => {const query = connection.query(
+    'INSERT INTO role SET ?',
+    {
+    id: id,
+      name: `${answer.newRole}`,
+      first_name: `${answer.firstName}`,
+    last_name: `${answer.lastName}`,
+      role_id: `${answer.roleId}`,
+      manager_id: `${answer.managerID}`
+    },
+    (err, res) => {
+        if (err) throw err;
+        console.log(`${res.affectedRows} product inserted!\n`);
+        updateRole();
+    }
+    )});
+  console.log('-----------------------------------');
+}
+
+//fucntion to create new role
+const query = connection.query(
         'INSERT INTO role SET ?',
         {
         id: id,
@@ -198,7 +215,7 @@ const addEmployee = () => {
         }
       );
       console.log('-----------------------------------');
-    }
+};
 
 //fucntion to view all department
   const viewDepartment = () => {
@@ -246,34 +263,34 @@ const updateRole= () => {
   };
 
 
-//function to update employee's manager.
-const updateEmployeeManager= () => {
-    connection.query('SELECT * from employee', (err, res) => {
-      if (err) throw err;
+// //function to update employee's manager.
+// const updateEmployeeManager= () => {
+//     connection.query('SELECT * from employee', (err, res) => {
+//       if (err) throw err;
 
-      res.forEach(({  }) => {
-        console.log(`${id} | ${first_name} | ${last_name} | ${role_id} | ${manager_id} `);
-      });
-      console.log('-----------------------------------');
-    });
-  };
+//       res.forEach(({  }) => {
+//         console.log(`${id} | ${first_name} | ${last_name} | ${role_id} | ${manager_id} `);
+//       });
+//       console.log('-----------------------------------');
+//     });
+//   };
 
 
-//function to view employees by manager.
-const viewEmployeeByManager= () => {
-    connection.query('SELECT * from employee', (err, res) => {
-      if (err) throw err;
+// //function to view employees by manager.
+// const viewEmployeeByManager= () => {
+//     connection.query('SELECT * from employee', (err, res) => {
+//       if (err) throw err;
 
-      res.forEach(({  }) => {
-        console.log(`${id} | ${first_name} | ${last_name} | ${role_id} | ${manager_id} `);
-      });
-      console.log('-----------------------------------');
-    });
-  };
+//       res.forEach(({  }) => {
+//         console.log(`${id} | ${first_name} | ${last_name} | ${role_id} | ${manager_id} `);
+//       });
+//       console.log('-----------------------------------');
+//     });
+//   };
 
-  console.log(query.sql);
+//   console.log(query.sql);
 
-//delete department.
+// //delete department.
 
 connection.connect((err) => {
   if (err) throw err;
