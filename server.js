@@ -61,128 +61,233 @@ const mainPrompt = () => {
     }
 });
 
-
+//Function to add new a new Department
 const addDepartment = () => {
-    inquirer.prompt({
-        name: "newDepartmenr",
+    inquirer.prompt([
+        {
+        name: "newDepartment",
         type: "input",
-        message: "Please add a department?"
-    });
-     connection.query('INSERT into department', (err, res) => {
+        message: "What is the name of the new department?"
+        },
+    ]).then((answer))
+    const query = connection.query(
+        'INSERT INTO department SET ?',
+        {
+        id:id,
+        name: `${answer.newDepartment}`
+        },
+        (err, res) => {
+            if (err) throw err;
+            console.log(`${res.affectedRows} new Department created!\n`);
+            updateProduct();
+        }
+      );
+      console.log('-----------------------------------');
+    }
+
+// function add roles
+const addRole = () => {
+    inquirer.prompt([
+        {
+        name: "newRole",
+        type: "input",
+        message: "What is the name of the new role?"
+        },
+        {
+         name: "newTitle",
+         type: "input",
+         message: "What is the name if the new Title"
+        },
+        {
+        name: "newSalaray",
+        type: "input",
+        message: "What is the salary for this role"
+        },
+        {
+        name: "deptId",
+        type: "list",
+        Choice:[ 
+        "1 = Humanresource",
+        "2 = Engineering",
+        "3 = Risk",
+        "4 = Mortgage Service",
+        "5 = Back Office"
+    ],
+}
+])
+    .then((answer))
+    const query = connection.query(
+        'INSERT INTO role SET ?',
+        {
+        id: id,
+          name: `${answer.newRole}`,
+          title: `${answer.newTitle}`,
+          salary: `${answer.newSalaray}`,
+          department_id: `${answer.deptId}`
+        },
+        (err, res) => {
+            if (err) throw err;
+            console.log(`${res.affectedRows} new Role created!\n`);
+            updateRole();
+        }
+      );
+      console.log('-----------------------------------');
+    }
+
+// //function to add employees
+const addEmployee = () => {
+    inquirer.prompt([
+        {
+         name: "firstName",
+         type: "input",
+         message: "What is the first name of the employee"
+        },
+        {
+        name: "lastname",
+        type: "input",
+        message: "What is the last name of the employee"
+        },
+        {
+        name: "roleId",
+        type: "choice",
+        message: "What is the role id?"
+        [
+            "1 = Humanresource Manager",
+            "2 = Engineering Manager",
+            "3 = Risk Manager",
+            "4 = Mortgage Services Manager",
+            "5 = Engineering Manager",
+            "6 = Risk Manager",
+            "7 = Mortgage Services Manager",
+            "8 = Back office Manager",
+            "9 = Assistant Manager",
+            "10 = Tech Lead",
+            "11 = Risk Lead",
+            "12 = Credit Manager",
+            "13 = Payments Lead"
+        ]
+        },
+        {
+        name: "roleId",
+        type: "choice",
+        message: "Who will the new Employee report too?"
+        [
+        "1 =  Humanresource Manager",
+        "2 = Engineering Manager",
+        "3 = Risk Manager",
+        "4 = Mortgage Service Manager",
+        "5 = Back Office Manger"
+        ]
+},
+])
+    .then((answer))
+    const query = connection.query(
+        'INSERT INTO role SET ?',
+        {
+        id: id,
+          name: `${answer.newRole}`,
+          first_name: `${answer.firstName}`,
+        last_name: `${answer.lastName}`,
+          role_id: `${answer.roleId}`,
+          manager_id: `${answer.managerID}`
+        },
+        (err, res) => {
+            if (err) throw err;
+            console.log(`${res.affectedRows} product inserted!\n`);
+            updateRole();
+        }
+      );
+      console.log('-----------------------------------');
+    }
+
+//fucntion to view all department
+  const viewDepartment = () => {
+    connection.query('SELECT * from department', (err, res) => {
+        if (err) throw err;
+        // Log all results of the SELECT statement
+        console.log(res);
+        connection.end();
+      });
+      console.log('-----------------------------------');
+    };
+
+//function to view all roles
+const viewRole= () => {
+    connection.query('SELECT * from roles', (err, res) => {
+        if (err) throw err;
+        // Log all results of the SELECT statement
+        console.log(res);
+        connection.end();
+      });
+      console.log('-----------------------------------');
+    };
+
+
+//function to view all employees
+const viewEmployee= () => {
+    connection.query('SELECT * from employee', (err, res) => {
+        if (err) throw err;
+        // Log all results of the SELECT statement
+        console.log(res);
+        connection.end();
+      });
+    };
+
+//Function to update employee roles.
+const updateRole= () => {
+    connection.query('SELECT * from employee', (err, res) => {
       if (err) throw err;
+
       res.forEach(({  }) => {
-        console.log(`${id} | ${title} | ${artist} | ${genre}`);
+        console.log(`${id} | ${first_name} | ${last_name} | ${role_id} | ${manager_id} `);
       });
       console.log('-----------------------------------');
     });
-  }}
-
-// // function add roles
-// const addRole = () => {
-//     connection.query('INSERT into role', (err, res) => {
-//       if (err) throw err;
-
-//       res.forEach(({  }) => {
-//         console.log(`${id} | ${title} | ${artist} | ${genre}`);
-//       });
-//       console.log('-----------------------------------');
-//     });
-//   };
+  };
 
 
-// //function to add employees
+//function to update employee's manager.
+const updateEmployeeManager= () => {
+    connection.query('SELECT * from employee', (err, res) => {
+      if (err) throw err;
 
-// //fucntion to view all department
-//   const viewDepartment = () => {
-//     connection.query('SELECT * from department', (err, res) => {
-//       if (err) throw err;
-
-//       res.forEach(({  }) => {
-//         console.log(`${id} | ${name} `);
-//       });
-//       console.log('-----------------------------------');
-//     });
-//   };
-
-// //function to view all roles
-// const viewRole= () => {
-//     connection.query('SELECT * from roles', (err, res) => {
-//       if (err) throw err;
-
-//       res.forEach(({  }) => {
-//         console.log(`${id} | ${title} | ${salary} | ${department_id} `);
-//       });
-//       console.log('-----------------------------------');
-//     });
-//   };
-
-// //function to view all employees
-// const viewEmployee= () => {
-//     connection.query('SELECT * from employee', (err, res) => {
-//       if (err) throw err;
-
-//       res.forEach(({  }) => {
-//         console.log(`${id} | ${first_name} | ${last_name} | ${role_id} | ${manager_id} `);
-//       });
-//       console.log('-----------------------------------');
-//     });
-//   };
-
-// //Function to update employee roles.
-// const updateRole= () => {
-//     connection.query('SELECT * from employee', (err, res) => {
-//       if (err) throw err;
-
-//       res.forEach(({  }) => {
-//         console.log(`${id} | ${first_name} | ${last_name} | ${role_id} | ${manager_id} `);
-//       });
-//       console.log('-----------------------------------');
-//     });
-//   };
+      res.forEach(({  }) => {
+        console.log(`${id} | ${first_name} | ${last_name} | ${role_id} | ${manager_id} `);
+      });
+      console.log('-----------------------------------');
+    });
+  };
 
 
-// //function to update employee's manager.
-// const updateEmployeeManager= () => {
-//     connection.query('SELECT * from employee', (err, res) => {
-//       if (err) throw err;
+//function to view employees by manager.
+const viewEmployeeByManager= () => {
+    connection.query('SELECT * from employee', (err, res) => {
+      if (err) throw err;
 
-//       res.forEach(({  }) => {
-//         console.log(`${id} | ${first_name} | ${last_name} | ${role_id} | ${manager_id} `);
-//       });
-//       console.log('-----------------------------------');
-//     });
-//   };
+      res.forEach(({  }) => {
+        console.log(`${id} | ${first_name} | ${last_name} | ${role_id} | ${manager_id} `);
+      });
+      console.log('-----------------------------------');
+    });
+  };
 
+  console.log(query.sql);
 
-// //function to view employees by manager.
-// const viewEmployeeByManager= () => {
-//     connection.query('SELECT * from employee', (err, res) => {
-//       if (err) throw err;
-
-//       res.forEach(({  }) => {
-//         console.log(`${id} | ${first_name} | ${last_name} | ${role_id} | ${manager_id} `);
-//       });
-//       console.log('-----------------------------------');
-//     });
-//   };
-
-//   console.log(quey.sql);
-// }
-// //delete department.
+//delete department.
 
 connection.connect((err) => {
   if (err) throw err;
   console.log(`connected as id ${connection.threadId}`);
 //   mainPrompt();
-//   addDepartment();clear
-//   addRole();
-//   viewDepartment();
-//   viewRole();
-//   viewEmployee();
-//   updateRole();
-//   updateEmployeeManager();
-//   viewEmployeeByManager();
-//   connection.end();
+  addDepartment();clear
+  addRole();
+  viewDepartment();
+  viewRole();
+  viewEmployee();
+  updateRole();
+  updateEmployeeManager();
+  viewEmployeeByManager();
+  connection.end();
 });
 
 mainPrompt();
