@@ -1,5 +1,7 @@
 const mysql = require("mysql");
 const inquirer = require("inquirer");
+const Table = require('cli-table');
+
 
 // create the connection information for the sql database
 const connection = mysql.createConnection({
@@ -12,78 +14,80 @@ const connection = mysql.createConnection({
 
 const mainPrompt = () => {
   // prompt for info about the item being put up for auction
-  inquirer.prompt({
-    name: "mainOption",
-    type: "list",
-    message: "What would you like to do today?",
-    choices: [
-      "Add a new department",
-      "Add a new role",
-      "Add a new employee",
-      "View all deprtments",
-      "View all role",
-      "View all employees",
-      "Update an employees role",
-      "Update an employees manager",
-      "View employees by manager",
-    ],
-  })
-  .then((answer) => {
-    if (answer === 'Add a new department') {
-        addDepartment();
-    }
-    if (answer === 'Add a new role') {
-        addRole();
-    }
-    if (answer === 'Add a new employee') {
-        addEmployee();
-    }
-    if (answer === 'View all deprtments') {
-        viewDepartment();
-    }
-    if (answer === 'View all role') {
-        viewRole();
-    }
-    if (answer === 'View all employees') {
-        viewEmployee();
-    }
-    if (answer === 'Update an employees role') {
-        updateRole();
-    }
-    if (answer === 'Update an employees manager') {
-        updateEmployeeManager();
-    }
-    if (answer === 'View employees by manager') {
-        viewEmployeeByManager();
-    }
-    else {
-        connection.end();
-    }
-});
-
-//Function to add new a new Department
+  inquirer
+    .prompt({
+      name: "mainOption",
+      type: "list",
+      message: "What would you like to do today?",
+      choices: [
+        "Add a new department",
+        "Add a new role",
+        "Add a new employee",
+        "View all departments",
+        "View all role",
+        "View all employees",
+        "Update an employees role",
+        "Update an employees manager",
+        "View employees by manager",
+      ],
+    })
+    .then((answer) => {
+      switch (answer.mainOption) {
+        case "Add a new department":
+          addDepartment();
+          break;
+        case "Add a new role":
+          addRole();
+          break;
+        case "Add a new employee":
+          addEmployee();
+          break;
+        case "View all departments":
+          viewAllDepartment();
+          break;
+        case "View all role":
+          viewAllRole();
+          break;
+        case "View all employees":
+          viewAllEmployee();
+          break;
+        // case "Exit application":
+        //   console.log("Application closed.\n");
+        //   setTimeout(() => {
+        //     connection.end();
+        //   }, 1000);
+        //   break;
+        default:
+          console.log("Invalid action");
+          break;
+      }
+    });
+  };
+// Function to add new a new Department
 const addDepartment = () => {
-    inquirer.prompt([
-        {
+  inquirer
+    .prompt([
+      {
         name: "newDepartment",
         type: "input",
-        message: "What is the name of the new department?"
+        message: "What is the name of the new department?",
+      },
+    ])
+    .then((answer) => {
+      const query = connection.query(
+        "INSERT INTO department SET ?",
+        {
+          name: `${answer.newDepartment}`,
         },
-    ]).then((answer) => {
-        const query = connection.query(
-            'INSERT INTO department SET ?',
-            {
-            id:id,
-            name: `${answer.newDepartment}`
-            },
-            (err, res) => {
-                if (err) throw err;
-                console.log(`${res.affectedRows} new Department created!\n`);
-                updateProduct();
-            }
-    )});
-      console.log('-----------------------------------');
-}
+        (err, res) => {
+          if (err) throw err;
+          console.log(`${res.affectedRows} new Department created!\n`);
+          mainPrompt();
+        }
+      );
+    });
+};
+console.log("-----------------------------------");
 
 // function add roles
 const addRole = () => {
@@ -106,7 +110,7 @@ const addRole = () => {
         {
         name: "deptId",
         type: "list",
-        Choice:[ 
+        Choice:[
         "1 = Humanresource",
         "2 = Engineering",
         "3 = Risk",
@@ -117,7 +121,6 @@ const addRole = () => {
 ]).then((answer) => {const query = connection.query(
         'INSERT INTO role SET ?',
         {
-        id: id,
           name: `${answer.newRole}`,
           title: `${answer.newTitle}`,
           salary: `${answer.newSalaray}`,
@@ -126,12 +129,11 @@ const addRole = () => {
         (err, res) => {
             if (err) throw err;
             console.log(`${res.affectedRows} new Role created!\n`);
-            updateRole();
+            mainPrompt();
         }
         )});
-      console.log('-----------------------------------');
     }
-    
+console.log('-----------------------------------');
 
 // //function to add employees
 const addEmployee = () => {
@@ -181,87 +183,66 @@ const addEmployee = () => {
 ]).then((answer) => {const query = connection.query(
     'INSERT INTO role SET ?',
     {
-    id: id,
       name: `${answer.newRole}`,
       first_name: `${answer.firstName}`,
-    last_name: `${answer.lastName}`,
+      last_name: `${answer.lastName}`,
       role_id: `${answer.roleId}`,
       manager_id: `${answer.managerID}`
     },
     (err, res) => {
         if (err) throw err;
         console.log(`${res.affectedRows} product inserted!\n`);
-        updateRole();
+        mainPrompt();
     }
     )});
-  console.log('-----------------------------------');
 }
-
-//fucntion to create new role
-const query = connection.query(
-        'INSERT INTO role SET ?',
-        {
-        id: id,
-          name: `${answer.newRole}`,
-          first_name: `${answer.firstName}`,
-        last_name: `${answer.lastName}`,
-          role_id: `${answer.roleId}`,
-          manager_id: `${answer.managerID}`
-        },
-        (err, res) => {
-            if (err) throw err;
-            console.log(`${res.affectedRows} product inserted!\n`);
-            updateRole();
-        }
-      );
-      console.log('-----------------------------------');
-};
+console.log('-----------------------------------');
 
 //fucntion to view all department
-  const viewDepartment = () => {
+  const viewAllDepartment = () => {
     connection.query('SELECT * from department', (err, res) => {
         if (err) throw err;
         // Log all results of the SELECT statement
         console.log(res);
-        connection.end();
+        console.table("All Employees:", res);
+        mainPrompt();
       });
-      console.log('-----------------------------------');
     };
+    console.log('-----------------------------------');
 
 //function to view all roles
-const viewRole= () => {
+const viewAllRole = () => {
     connection.query('SELECT * from roles', (err, res) => {
         if (err) throw err;
         // Log all results of the SELECT statement
         console.log(res);
-        connection.end();
+        mainPrompt();
       });
-      console.log('-----------------------------------');
     };
-
+    console.log('-----------------------------------');
 
 //function to view all employees
-const viewEmployee= () => {
+const viewAllEmployee= () => {
     connection.query('SELECT * from employee', (err, res) => {
         if (err) throw err;
         // Log all results of the SELECT statement
         console.log(res);
-        connection.end();
+        mainPrompt();
       });
     };
+    console.log('-----------------------------------');
 
-//Function to update employee roles.
-const updateRole= () => {
-    connection.query('SELECT * from employee', (err, res) => {
-      if (err) throw err;
+// //Function to update employee roles.
+// const updateRole= () => {
+//     connection.query('SELECT * from employee', (err, res) => {
+//       if (err) throw err;
 
-      res.forEach(({  }) => {
-        console.log(`${id} | ${first_name} | ${last_name} | ${role_id} | ${manager_id} `);
-      });
-      console.log('-----------------------------------');
-    });
-  };
-
+//       res.forEach(({  }) => {
+//         console.log(`${id} | ${first_name} | ${last_name} | ${role_id} | ${manager_id} `);
+//       });
+//     });
+//   }
+//   console.log('-----------------------------------');
 
 // //function to update employee's manager.
 // const updateEmployeeManager= () => {
@@ -274,7 +255,6 @@ const updateRole= () => {
 //       console.log('-----------------------------------');
 //     });
 //   };
-
 
 // //function to view employees by manager.
 // const viewEmployeeByManager= () => {
@@ -295,16 +275,6 @@ const updateRole= () => {
 connection.connect((err) => {
   if (err) throw err;
   console.log(`connected as id ${connection.threadId}`);
-//   mainPrompt();
-  addDepartment();clear
-  addRole();
-  viewDepartment();
-  viewRole();
-  viewEmployee();
-  updateRole();
-  updateEmployeeManager();
-  viewEmployeeByManager();
-  connection.end();
 });
 
 mainPrompt();
