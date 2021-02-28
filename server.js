@@ -51,6 +51,8 @@ const mainPrompt = () => {
         case "View all employees":
           viewAllEmployee();
           break;
+        case "View all employees":
+          updateRole();
         // case "Exit application":
         //   console.log("Application closed.\n");
         //   setTimeout(() => {
@@ -103,7 +105,7 @@ const addRole = () => {
          message: "What is the name if the new Title"
         },
         {
-        name: "newSalaray",
+        name: "newSalary",
         type: "input",
         message: "What is the salary for this role"
         },
@@ -123,7 +125,7 @@ const addRole = () => {
         {
           name: `${answer.newRole}`,
           title: `${answer.newTitle}`,
-          salary: `${answer.newSalaray}`,
+          salary: `${answer.newSalary}`,
           department_id: `${answer.deptId}`
         },
         (err, res) => {
@@ -212,7 +214,7 @@ console.log('-----------------------------------');
 
 //function to view all roles
 const viewAllRole = () => {
-    connection.query('SELECT * from roles', (err, res) => {
+    connection.query('SELECT * from role', (err, res) => {
         if (err) throw err;
         // Log all results of the SELECT statement
         console.log(res);
@@ -232,17 +234,42 @@ const viewAllEmployee= () => {
     };
     console.log('-----------------------------------');
 
-// //Function to update employee roles.
-// const updateRole= () => {
-//     connection.query('SELECT * from employee', (err, res) => {
-//       if (err) throw err;
-
-//       res.forEach(({  }) => {
-//         console.log(`${id} | ${first_name} | ${last_name} | ${role_id} | ${manager_id} `);
-//       });
-//     });
-//   }
-//   console.log('-----------------------------------');
+//Function to update employee roles.
+const updateRole = () => {
+  inquirer.prompt([
+     {
+     name: "roleId",
+     type: "choice",
+     message: "What is the employeed new role?"
+     [
+         "1 = Humanresource Manager",
+         "2 = Engineering Manager",
+         "3 = Risk Manager",
+         "4 = Mortgage Services Manager",
+         "5 = Engineering Manager",
+         "6 = Risk Manager",
+         "7 = Mortgage Services Manager",
+         "8 = Back office Manager",
+         "9 = Assistant Manager",
+         "10 = Tech Lead",
+         "11 = Risk Lead",
+         "12 = Credit Manager",
+         "13 = Payments Lead"
+     ]
+},
+]).then((answer) => {const query = connection.query(
+  'INSERT INTO role SET ?',
+  {
+    role_id: `${answer.roleId}`,
+  },
+  (err, res) => {
+      if (err) throw err;
+      console.log(`${res.affectedRows} role updated!\n`);
+      mainPrompt();
+  }
+  )});
+}
+console.log('-----------------------------------');
 
 // //function to update employee's manager.
 // const updateEmployeeManager= () => {
