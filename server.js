@@ -10,7 +10,7 @@ const connection = mysql.createConnection({
   port: 3306,
   user: "root",
   password: "yourRootPassword",
-  database: "employeedb",
+  database: "employee_db",
 });
 
 const mainPrompt = () => {
@@ -55,6 +55,9 @@ const mainPrompt = () => {
         case "Update an employees role":
           updateRole();
           break;
+        case "View employees by manager":
+          viewEmployeeByManager();
+          break; 
         // case "Exit application":
         //   console.log("Application closed.\n");
         //   setTimeout(() => {
@@ -70,6 +73,7 @@ const mainPrompt = () => {
 
 //function to view all department
 const viewAllDepartment = () => {
+  console.log('Displaying all departments in the database...\n')
   connection.query("SELECT name from department", (err, res) => {
     if (err) throw err;
     // console.log(res);
@@ -84,6 +88,7 @@ mainPrompt();
 
 //function to view all roles
 const viewAllRole = () => {
+  console.log('Displaying all roles in the database...\n')
   connection.query("SELECT * from role", (err, res) => {
     if (err) throw err;
     // console.log(res);
@@ -119,6 +124,7 @@ const addDepartment = () => {
       },
     ])
     .then((answer) => {
+      console.log('Adding new department to the database...\n')
       const query = connection.query(
         "INSERT INTO department SET ?",
         {
@@ -155,6 +161,7 @@ const addRole = () => {
       },
     ])
     .then((answer) => {
+      console.log('Adding new role to the database...\n')
       const query = connection.query(
         "INSERT INTO role SET ?",
         {
@@ -213,6 +220,7 @@ const addEmployee = () => {
       },
     ])
     .then((answer) => {
+      console.log('Adding new employee to the database...\n')
       const query = connection.query(
         "INSERT INTO employee SET ?",
         {
@@ -276,7 +284,8 @@ const updateRole = () => {
 
 // //function to update employee's manager.
 // const updateEmployeeManager= () => {
-//     connection.query('SELECT * from employee', (err, res) => {
+//     connection.query('
+// ', (err, res) => {
 //       if (err) throw err;
 
 //       res.forEach(({  }) => {
@@ -286,18 +295,18 @@ const updateRole = () => {
 //     });
 //   };
 
-// //function to view employees by manager.
-// const viewEmployeeByManager= () => {
-//     connection.query('SELECT * from employee', (err, res) => {
-//       if (err) throw err;
-
-//       res.forEach(({  }) => {
-//         console.log(`${id} | ${first_name} | ${last_name} | ${role_id} | ${manager_id} `);
-//       });
-//       console.log('-----------------------------------');
-//     });
-//   };
-
+//function to view employees by manager.
+const viewEmployeeByManager = () => {
+  connection.query("Select id from employee where id = ? where = manager_id =?", (err, res) => {
+    if (err) throw err;
+    // console.log(res);
+    res.forEach(({ id, first_name, last_name,manager_id}) => {
+      console.log(`${id} | ${first_name} | ${last_name} |  ${manager_id}`);
+    });
+    // console.log(query.sql);
+mainPrompt();
+  });
+};
 //   console.log(query.sql);
 
 // //delete department.
