@@ -1,6 +1,8 @@
 const mysql = require("mysql");
 const inquirer = require("inquirer");
 const Table = require("cli-table");
+const {cli} = require('cli-ux')
+
 
 // create the connection information for the sql database
 const connection = mysql.createConnection({
@@ -65,6 +67,47 @@ const mainPrompt = () => {
       }
     });
 };
+
+//function to view all department
+const viewAllDepartment = () => {
+  connection.query("SELECT name from department", (err, res) => {
+    if (err) throw err;
+    // console.log(res);
+    res.forEach(({ name}) => {
+      console.log(`${name}`);
+    });
+    // console.log(query.sql);
+mainPrompt();
+  });
+};
+
+
+//function to view all roles
+const viewAllRole = () => {
+  connection.query("SELECT * from role", (err, res) => {
+    if (err) throw err;
+    // console.log(res);
+    res.forEach(({ id, title, salary, department_id}) => {
+      console.log(`${id} | ${title} | ${salary} | ${department_id}`);
+    });
+    // console.log(query.sql);
+mainPrompt();
+  });
+};
+
+//function to view all employees
+const viewAllEmployee = () => {
+  connection.query("SELECT * from employee", (err, res) => {
+    if (err) throw err;
+    // console.log(res);
+    res.forEach(({ id, first_name, last_name,role_id,manager_id}) => {
+      console.log(`${id} | ${first_name} | ${last_name} | ${role_id}| ${manager_id}`);
+    });
+    // console.log(query.sql);
+mainPrompt();
+  });
+};
+
 // Function to add new a new Department
 const addDepartment = () => {
   inquirer
@@ -126,7 +169,6 @@ const addRole = () => {
         }
       );
     });
-  console.log("-----------------------------------");
 };
 
 // //function to add employees
@@ -146,7 +188,58 @@ const addEmployee = () => {
       {
         name: "eRoleId",
         type: "list",
-        message: "What is the employee's role id?",
+        message: "What is the employee's role title?",
+        choices: [
+          "Humanresource Manager",
+          "Engineering Manager",
+          "Risk Manager",
+          "Risk Manager",
+          "Engineering Asst. Manager",
+          "Risk Asst.Manager",
+          "Mortgage Services Asst.Manager",
+          "Back office Manager",
+          "Assistant Manager",
+          "Tech lead",
+          "Risk Lead",
+          "Credit Manager",
+          "Payments Lead",
+        ],
+      },
+      {
+        name: "eManagerId",
+        type: "list",
+        message: "Who will the new Employee report too?",
+        choices: ["1", "2", "3", "4 ", "5"],
+      },
+    ])
+    .then((answer) => {
+      const query = connection.query(
+        "INSERT INTO employee SET ?",
+        {
+          first_name: `${answer.EmployeeFirstName}`,
+          last_name: `${answer.lastName}`,
+          role_id: `${answer.eRoleId}`,
+          manager_id: `${answer.eManagerId}`,
+        },
+        (err, res) => {
+          if (err) throw err;
+          console.log(`${res.affectedRows} new employee added to Database!\n`);
+          mainPrompt();
+        }
+      );
+    });
+  console.log("-----------------------------------");
+};
+
+//Function to update employee roles.
+const updateRole = () => {
+  inquirer
+    .prompt([
+      viewAllEmployee(),
+      {
+        name: "newRoleId",
+        type: "list",
+        message: "What is the employees new role?",
         choices: [
           "1",
           "2",
@@ -163,96 +256,13 @@ const addEmployee = () => {
           "13",
         ],
       },
-      {
-        name: "managerId",
-        type: "list",
-        message: "Who will the new Employee report too?",
-        choices: ["1", "2", "3", "4 ", "5"],
-      },
     ])
     .then((answer) => {
       const query = connection.query(
-        "INSERT INTO employee SET ?",
+        "UPDATE employee SET role_id =? WHERE id = ?"
+     ,
         {
-          first_name: `${answer.EmployeeFirstName}`,
-          last_name: `${answer.lastName}`,
-          role_id: `${answer.roleId}`,
-          manager_id: `${answer.managerId}`,
-        },
-        (err, res) => {
-          if (err) throw err;
-          console.log(`${res.affectedRows} product inserted!\n`);
-          mainPrompt();
-        }
-      );
-    });
-  console.log("-----------------------------------");
-};
-
-//fucntion to view all department
-const viewAllDepartment = () => {
-  connection.query("SELECT * from department", (err, res) => {
-    if (err) throw err;
-    // Log all results of the SELECT statement
-    console.log(res);
-    console.table("All Employees:", res);
-    mainPrompt();
-  });
-  console.log("-----------------------------------");
-};
-
-//function to view all roles
-const viewAllRole = () => {
-  connection.query("SELECT * from role", (err, res) => {
-    if (err) throw err;
-    // Log all results of the SELECT statement
-    console.log(res);
-    mainPrompt();
-  });
-  console.log("-----------------------------------");
-};
-
-//function to view all employees
-const viewAllEmployee = () => {
-  connection.query("SELECT * from employee", (err, res) => {
-    if (err) throw err;
-    // Log all results of the SELECT statement
-    console.log(res);
-    mainPrompt();
-  });
-  console.log("-----------------------------------");
-};
-
-//Function to update employee roles.
-const updateRole = () => {
-  inquirer
-    .prompt([
-      {
-        name: "newRoleId",
-        type: "list",
-        message: "What is the employees new role?",
-        choices: [
-          "1 = Humanresource Manager",
-          "2 = Engineering Manager",
-          "3 = Risk Manager",
-          "4 = Mortgage Services Manager",
-          "5 = Engineering Manager",
-          "6 = Risk Manager",
-          "7 = Mortgage Services Manager",
-          "8 = Back office Manager",
-          "9 = Assistant Manager",
-          "10 = Tech Lead",
-          "11 = Risk Lead",
-          "12 = Credit Manager",
-          "13 = Payments Lead",
-        ],
-      },
-    ])
-    .then((answer) => {
-      const query = connection.query(
-        "INSERT INTO role SET ?",
-        {
-          role_id: `${answer.newRoleId}`,
+          id: `${answer.newRoleId}`
         },
         (err, res) => {
           if (err) throw err;

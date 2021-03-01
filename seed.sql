@@ -13,21 +13,20 @@ VALUES ("Mortgage Services");
 INSERT INTO department (name)
 VALUES ("Back Office");
 
+INSERT INTO role (title,salary,department_id)
+VALUES("Humanresource Manager", 130000,1);
 
 INSERT INTO role (title,salary,department_id)
-VALUES("manager", 130000,1);
+VALUES("Engineering Manager", 180000,2);
 
 INSERT INTO role (title,salary,department_id)
-VALUES("manager", 180000,2);
+VALUES("Risk Manager", 140000,3);
 
 INSERT INTO role (title,salary,department_id)
-VALUES("manager", 140000,3);
+VALUES("Mortgage Services Manager", 120000,4);
 
 INSERT INTO role (title,salary,department_id)
-VALUES("manager", 120000,4);
-
-INSERT INTO role (title,salary,department_id)
-VALUES("manager", 135000,5);
+VALUES("Back Office Manager", 135000,5);
 
 INSERT INTO role (title,salary,department_id)
 VALUES("Assistant Manager", 100000,1);
@@ -48,29 +47,22 @@ INSERT INTO employee (first_name,last_name,role_id,manager_id)
 VALUES("John","doe", 1,1);
 
 INSERT INTO employee (first_name,last_name,role_id,manager_id)
-VALUES("James","Martin", 3,5);
+VALUES("James","Martin", 3,3);
 
 INSERT INTO employee (first_name,last_name,role_id,manager_id)
-VALUES("Eric","Junior", 2,4);
+VALUES("Eric","Junior", 2,3);
 
 INSERT INTO employee (first_name,last_name,role_id,manager_id)
-VALUES("Esse","Fitt", 3,5);
+VALUES("Esse","Fitt", 4,2);
 
 INSERT INTO employee (first_name,last_name,role_id,manager_id)
-VALUES("Vincent","Ng", 1,2);
+VALUES("Vincent","Ng", 5,5);
 
 INSERT INTO employee (first_name,last_name,role_id,manager_id)
-VALUES("Nathan","Tran", 3,3);
+VALUES("Nathan","Tran", 3,2);
 
 INSERT INTO employee (first_name,last_name,role_id,manager_id)
-VALUES("Melanie","Walsh", 2,4);
+VALUES("Melanie","Walsh", 3,1);
 
 INSERT INTO employee (first_name,last_name,role_id,manager_id)
-VALUES("Mark","Levy", 4,1);
-
-
-
-
-
-
-
+VALUES("Mark","Levy", 4,5);
