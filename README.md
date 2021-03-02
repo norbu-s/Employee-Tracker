@@ -18,17 +18,15 @@ The main motivation for this project was to create an app where we could track a
 1. Clone this repository.
 2. Install dependencies
 - npm 
-- express
-- generate-unique-id
-- i
+- inquirer
 - nodemon
+- console.table
 
 
 ## Technologies Used 
 - JavaScript
 - Command-line interface
 - Node.js
-- Express.js
 - MySql
 
 # links
