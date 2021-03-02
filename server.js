@@ -1,7 +1,6 @@
 const mysql = require("mysql");
 const inquirer = require("inquirer");
-const Table = require("cli-table");
-const {cli} = require('cli-ux')
+const cTable = require("console.table");
 
 
 // create the connection information for the sql database
@@ -30,6 +29,7 @@ const mainPrompt = () => {
         "Update an employees role",
         "Update an employees manager",
         "View employees by manager",
+        "Exit"
       ],
     })
     .then((answer) => {
@@ -55,15 +55,16 @@ const mainPrompt = () => {
         case "Update an employees role":
           updateRole();
           break;
+        case "Update an employees role":
+          viewEmployeeByManager();
+          break;
         case "View employees by manager":
           viewEmployeeByManager();
-          break; 
-        // case "Exit application":
-        //   console.log("Application closed.\n");
-        //   setTimeout(() => {
-        //     connection.end();
-        //   }, 1000);
-        //   break;
+          break;
+  
+        case 'Exit':
+            connection.end();
+            break;
         default:
           console.log("Invalid action");
           break;
@@ -74,13 +75,10 @@ const mainPrompt = () => {
 //function to view all department
 const viewAllDepartment = () => {
   console.log('Displaying all departments in the database...\n')
-  connection.query("SELECT name from department", (err, res) => {
+  connection.query("SELECT id, name As Department from department", (err, res) => {
     if (err) throw err;
-    // console.log(res);
-    res.forEach(({ name}) => {
-      console.log(`${name}`);
-    });
-    // console.log(query.sql);
+    console.table(res);
+    console.log("===================MAIN MENU==================");
 mainPrompt();
   });
 };
@@ -89,26 +87,20 @@ mainPrompt();
 //function to view all roles
 const viewAllRole = () => {
   console.log('Displaying all roles in the database...\n')
-  connection.query("SELECT * from role", (err, res) => {
+  connection.query("SELECT r.id, title, salary, name AS department FROM role r LEFT JOIN department d ON department_id = d.id", (err, res) => {
     if (err) throw err;
-    // console.log(res);
-    res.forEach(({ id, title, salary, department_id}) => {
-      console.log(`${id} | ${title} | ${salary} | ${department_id}`);
-    });
-    // console.log(query.sql);
+    console.table(res);
+    console.log("===================MAIN MENU==================");
 mainPrompt();
   });
 };
 
 //function to view all employees
 const viewAllEmployee = () => {
-  connection.query("SELECT * from employee", (err, res) => {
+  const query = connection.query('SELECT e.id, e.first_name AS First_Name, e.last_name AS Last_Name, title AS Title, salary AS Salary, name AS Department, CONCAT(m.first_name, " ", m.last_name) AS Manager FROM employee e LEFT JOIN employee m ON e.manager_id = m.id INNER JOIN role r ON e.role_id = r.id INNER JOIN department d ON r.department_id = d.id', (err, res) => {
     if (err) throw err;
-    // console.log(res);
-    res.forEach(({ id, first_name, last_name,role_id,manager_id}) => {
-      console.log(`${id} | ${first_name} | ${last_name} | ${role_id}| ${manager_id}`);
-    });
-    // console.log(query.sql);
+    console.table(res);
+    console.log("===================MAIN MENU==================");
 mainPrompt();
   });
 };
@@ -126,22 +118,22 @@ const addDepartment = () => {
     .then((answer) => {
       console.log('Adding new department to the database...\n')
       const query = connection.query(
-        "INSERT INTO department SET ?",
+        "INSERT INTO department SET?",
         {
           name: `${answer.newDepartment}`,
         },
         (err, res) => {
           if (err) throw err;
-          console.log(`${res.affectedRows} new Department created!\n`);
+          console.log(`${answer.newDepartment} new Department created!\n`);
+          console.log("===================MAIN MENU==================");
           mainPrompt();
         }
       );
     });
 };
-console.log("----------------MENU-------------------");
 
-// function add roles
-const addRole = () => {
+//Add role
+async function addRole() {
   inquirer
     .prompt([
       {
@@ -155,31 +147,34 @@ const addRole = () => {
         message: "What is the salary for this role",
       },
       {
-        name: "deptId",
+        name: "department",
         type: "list",
-        choices: ["1", "2", "3", "4", "5"],
+        message: "Which department does this role belong to?",
+        choices: "department"
       },
     ])
     .then((answer) => {
       console.log('Adding new role to the database...\n')
       const query = connection.query(
-        "INSERT INTO role SET ?",
+        "INSERT INTO role (title, salary, department_id) VALUES (?)",
         {
           title: `${answer.newTitle}`,
           salary: `${answer.newSalary}`,
-          department_id: `${answer.deptId}`,
+          department: `${answer.department}`,
         },
         (err, res) => {
           if (err) throw err;
-          console.log(`${res.affectedRows} new Role created!\n`);
+          console.table(`${answer.newTitle} new Role created for ${answer.dept}!\n`);
+          console.log("===================MAIN MENU==================");
           mainPrompt();
         }
       );
     });
 };
 
+
 // //function to add employees
-const addEmployee = () => {
+async function addEmployee() {
   inquirer
     .prompt([
       {
@@ -192,32 +187,6 @@ const addEmployee = () => {
         type: "input",
         message: "What is the last name of the employee",
       },
-      {
-        name: "eRoleId",
-        type: "list",
-        message: "What is the employee's role title?",
-        choices: [
-          "Humanresource Manager",
-          "Engineering Manager",
-          "Risk Manager",
-          "Risk Manager",
-          "Engineering Asst. Manager",
-          "Risk Asst.Manager",
-          "Mortgage Services Asst.Manager",
-          "Back office Manager",
-          "Assistant Manager",
-          "Tech lead",
-          "Risk Lead",
-          "Credit Manager",
-          "Payments Lead",
-        ],
-      },
-      {
-        name: "eManagerId",
-        type: "list",
-        message: "Who will the new Employee report too?",
-        choices: ["1", "2", "3", "4 ", "5"],
-      },
     ])
     .then((answer) => {
       console.log('Adding new employee to the database...\n')
@@ -226,51 +195,46 @@ const addEmployee = () => {
         {
           first_name: `${answer.EmployeeFirstName}`,
           last_name: `${answer.lastName}`,
-          role_id: `${answer.eRoleId}`,
-          manager_id: `${answer.eManagerId}`,
         },
         (err, res) => {
           if (err) throw err;
           console.log(`${res.affectedRows} new employee added to Database!\n`);
+          console.log("===================MAIN MENU==================");
           mainPrompt();
         }
       );
     });
-  console.log("-----------------------------------");
 };
 
+
 //Function to update employee roles.
-const updateRole = () => {
+async function updateRole() {
   inquirer
     .prompt([
-      viewAllEmployee(),
+      // viewAllEmployee(),
+      {
+        name: "employeeName",
+        type: "list",
+        message: "Select the employee to update the role",
+        choices:
+         employee.map(obj =>obj.name)
+      },
       {
         name: "newRoleId",
         type: "list",
-        message: "What is the employees new role?",
+        message: "Select the employee to update the role",
         choices: [
-          "1",
-          "2",
-          "3",
-          "4",
-          "5",
-          "6",
-          "7",
-          "8",
-          "9",
-          "10",
-          "11",
-          "12",
-          "13",
-        ],
+
+        ]
+      
       },
     ])
     .then((answer) => {
       const query = connection.query(
-        "UPDATE employee SET role_id =? WHERE id = ?"
-     ,
+        'UPDATE role SET ? WHERE ?',
+        [roleId,employeeID],
         {
-          id: `${answer.newRoleId}`
+          title: `${answer.newRoleId}`
         },
         (err, res) => {
           if (err) throw err;
@@ -279,37 +243,9 @@ const updateRole = () => {
         }
       );
     });
-  console.log("-----------------------------------");
 };
+console.log("===================MAIN MENU==================");
 
-// //function to update employee's manager.
-// const updateEmployeeManager= () => {
-//     connection.query('
-// ', (err, res) => {
-//       if (err) throw err;
-
-//       res.forEach(({  }) => {
-//         console.log(`${id} | ${first_name} | ${last_name} | ${role_id} | ${manager_id} `);
-//       });
-//       console.log('-----------------------------------');
-//     });
-//   };
-
-//function to view employees by manager.
-const viewEmployeeByManager = () => {
-  connection.query("Select id from employee where id = ? where = manager_id =?", (err, res) => {
-    if (err) throw err;
-    // console.log(res);
-    res.forEach(({ id, first_name, last_name,manager_id}) => {
-      console.log(`${id} | ${first_name} | ${last_name} |  ${manager_id}`);
-    });
-    // console.log(query.sql);
-mainPrompt();
-  });
-};
-//   console.log(query.sql);
-
-// //delete department.
 
 connection.connect((err) => {
   if (err) throw err;
