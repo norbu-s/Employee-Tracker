@@ -37,6 +37,10 @@ The main motivation for this project was to create an app where we could track a
 
 <img width="691" alt="Screen Shot 2021-03-02 at 9 53 39 am" src="https://user-images.githubusercontent.com/73917485/109650783-d224ff80-7bb1-11eb-8582-a2e8ecea6bdf.png">
 
+![Screen Recording 2021-03-02 at 11 58 00 pm](https://user-images.githubusercontent.com/73917485/109653277-efa79880-7bb4-11eb-8fdc-25e134eb63a8.gif)
+
+
+
 
 ## License
 This application is covered under the ISC license.
