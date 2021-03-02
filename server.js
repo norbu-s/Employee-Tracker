@@ -1,7 +1,7 @@
 const mysql = require("mysql");
 const inquirer = require("inquirer");
 const cTable = require("console.table");
-const connection = require('./DB/connection');
+const connection = require("./DB/connection");
 
 const mainPrompt = () => {
   // prompt for info about the item being put up for auction
@@ -18,20 +18,11 @@ const mainPrompt = () => {
         "View all role",
         "View all employees",
         "Update an employees role",
-        "Exit"
+        "Exit",
       ],
     })
     .then((answer) => {
       switch (answer.mainOption) {
-        case "Add a new department":
-          addDepartment();
-          break;
-        case "Add a new role":
-          addRole();
-          break;
-        case "Add a new employee":
-          addEmployee();
-          break;
         case "View all departments":
           viewAllDepartment();
           break;
@@ -44,9 +35,18 @@ const mainPrompt = () => {
         case "Update an employees role":
           updateRole();
           break;
-        case 'Exit':
-            connection.end();
-            break;
+        case "Add a new department":
+          addDepartment();
+          break;
+        case "Add a new role":
+          addRole();
+          break;
+        case "Add a new employee":
+          addEmployee();
+          break;
+        case "Exit":
+          connection.end();
+          break;
         default:
           console.log("Invalid action");
           break;
@@ -56,37 +56,45 @@ const mainPrompt = () => {
 
 //function to view all department
 const viewAllDepartment = () => {
-  console.log('Displaying all departments in the database...\n')
-  connection.query("SELECT id, name As Department from department", (err, res) => {
-    if (err) throw err;
-    console.table(res);
-    console.log("===================MAIN MENU==================");
-mainPrompt();
-  });
+  console.log("Displaying all departments in the database...\n");
+  connection.query(
+    "SELECT id, name As Department from department",
+    (err, res) => {
+      if (err) throw err;
+      console.table(res);
+      console.log("===================MAIN MENU==================");
+      mainPrompt();
+    }
+  );
 };
-
 
 //function to view all roles
 const viewAllRole = () => {
-  console.log('Displaying all roles in the database...\n')
-  connection.query("SELECT r.id, title, salary, name AS department FROM role r LEFT JOIN department d ON department_id = d.id", (err, res) => {
-    if (err) throw err;
-    console.table(res);
-mainPrompt();
-  });
+  console.log("Displaying all roles in the database...\n");
+  connection.query(
+    "SELECT r.id, title, salary, name AS department FROM role r LEFT JOIN department d ON department_id = d.id",
+    (err, res) => {
+      if (err) throw err;
+      console.table(res);
+      mainPrompt();
+    }
+  );
 };
 
 //function to view all employees
 const viewAllEmployee = () => {
-  const query = connection.query('SELECT e.id, e.first_name AS First_Name, e.last_name AS Last_Name, title AS Title, salary AS Salary, name AS Department, CONCAT(m.first_name, " ", m.last_name) AS Manager FROM employee e LEFT JOIN employee m ON e.manager_id = m.id INNER JOIN role r ON e.role_id = r.id INNER JOIN department d ON r.department_id = d.id', (err, res) => {
-    if (err) throw err;
-    console.table(res);
-mainPrompt();
-  });
+  const query = connection.query(
+    'SELECT e.id, e.first_name AS First_Name, e.last_name AS Last_Name, title AS Title, salary AS Salary, name AS Department, CONCAT(m.first_name, " ", m.last_name) AS Manager FROM employee e LEFT JOIN employee m ON e.manager_id = m.id INNER JOIN role r ON e.role_id = r.id INNER JOIN department d ON r.department_id = d.id',
+    (err, res) => {
+      if (err) throw err;
+      console.table(res);
+      mainPrompt();
+    }
+  );
 };
 
 // Function to add new a new Department
-const addDepartment = () => {
+addDepartment = () => {
   inquirer
     .prompt([
       {
@@ -96,7 +104,7 @@ const addDepartment = () => {
       },
     ])
     .then((answer) => {
-      console.log('Adding new department to the database...\n')
+      console.log("Adding new department to the database...\n");
       const query = connection.query(
         "INSERT INTO department SET?",
         {
@@ -112,7 +120,10 @@ const addDepartment = () => {
 };
 
 //Add Role
-  const newRole = inquirer.prompt([
+
+addRole = () =>
+  inquirer
+    .prompt([
       {
         name: "newTitle",
         type: "input",
@@ -126,22 +137,24 @@ const addDepartment = () => {
       {
         name: "departmentId",
         type: "list",
-        message: "Which department does this role belong to?",
-        choices: ["1","2","3","4","5"]
+        message: "Which department does this role belong to? || 1 - Human Resource || 2 - Engineering || 3 - Risk || 4 - Mortgage Service || 5 - Back Office||",
+        choices: ["1", "2", "3", "4", "5"], 
       },
     ])
     .then((answer) => {
-      console.log('Adding new role to the database...\n')
+      console.log("Adding new role to the database...\n");
       const query = connection.query(
-        "INSERT INTO role (title, salary, department_id) VALUES (?)",
+        "INSERT INTO role (title, salary,department_Id) VALUES (?)",
         {
           title: `${answer.newTitle}`,
           salary: `${answer.newSalary}`,
-          department: `${answer.department_id}`,
+          department_Id: `${answer.departmentId}`
         },
         (err, res) => {
           if (err) throw err;
-          console.table(`${answer.newTitle} new Role created for ${answer.department_id}!\n`);
+          console.table(
+            `${answer.newTitle} new role created for ${answer.departmentId} !\n`
+          );
           console.log("===================MAIN MENU==================");
           mainPrompt();
         }
@@ -149,7 +162,7 @@ const addDepartment = () => {
     });
 
 // //function to add employees
-async function addEmployee() {
+ addEmployee = () => {
   inquirer
     .prompt([
       {
@@ -162,29 +175,43 @@ async function addEmployee() {
         type: "input",
         message: "What is the last name of the employee",
       },
+      {
+        name: "roleId",
+        type: "list",
+        message: "What is the new employees role?  || 6 - Assistant Manager || 7 - Tech lead || 8 - Risk Lead || 9 - Credit Manager || 10 - Payments Lead||",
+        choices: ["6", "7", "8", "9", "10"], 
+      },
+      {
+        name: "managerId",
+        type: "list",
+        message: "Which manager will the new employee report too?  || 1 - Human Resource || 2 - Engineering || 3 - Risk || 4 - Mortgage Service || 5 - Back Office||",
+        choices: ["1", "2", "3", "4", "5"], 
+      },
     ])
     .then((answer) => {
-      console.log('Adding new employee to the database...\n')
+      console.log("Adding new employee to the database...\n");
       const query = connection.query(
-        "INSERT INTO employee SET ?",
+        "INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?)",
         {
           first_name: `${answer.EmployeeFirstName}`,
-          last_name: `${answer.lastName}`,
+          last_name: `${answer.EmployeeLastName}`,
+          role_id:`${answer.roleId}`,
+          manager_id:`${answer.managerId}`
         },
         (err, res) => {
           if (err) throw err;
-          console.log(`${res.affectedRows} new employee added to Database!\n`);
+          console.log(`${answer.EmployeeFirstName} ${answer.EmployeeLastName} added to Database!\n`);
           console.log("===================MAIN MENU==================");
           mainPrompt();
         }
       );
     });
-};
-
+}
 
 //Function to update employee roles.
-async function updateRole() {
-    inquirer.prompt([
+ updateRole = () => {
+  inquirer
+    .prompt([
       {
         name: "employeeName",
         type: "list",
@@ -196,24 +223,23 @@ async function updateRole() {
           "James Martin",
           "James West",
           "Vincent Ng",
-          "Eric Junior", 
-          "Melanie Walsh", 
-          "Mark Levy",  
-        ]
+          "Eric Junior",
+          "Melanie Walsh",
+          "Mark Levy",
+        ],
       },
       {
         name: "newRoleId",
         type: "list",
-        message: "Select the employee to update the role",
-        choices: ["1","2","3","4","5"]
+        message: "What is the new employees role?  || 6 - Assistant Manager || 7 - Tech lead || 8 - Risk Lead || 9 - Credit Manager || 10 - Payments Lead||",
+        choices: ["6", "7", "8", "9", "10"], 
       },
     ])
     .then((answer) => {
       const query = connection.query(
-        "UPDATE `employee SET role_id =? whereid=?",
-        [roleId,employeeID],
+        "UPDATE employee_db.employee SET role_id = ? = where id = id",
         {
-          title: `${answer.newRoleId}`
+          role_id: `${answer.newRoleId}`,
         },
         (err, res) => {
           if (err) throw err;
@@ -222,7 +248,10 @@ async function updateRole() {
         }
       );
     });
-};
+}
 console.log("===================MAIN MENU==================");
 
 mainPrompt();
+
+
+// DELETE FROM `employee_db`.`role` WHERE (`id` = '22');
