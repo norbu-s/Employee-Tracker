@@ -33,7 +33,7 @@ The main motivation for this project was to create an app where we could track a
 
 # links
 * Github Repo - https://github.com/norbu-s/Employee-Tracker
-* Heroku - 
+* Video link - https://drive.google.com/file/d/158HmEcSmvVauRJeBMOAOTeBL3290Wsjl/view?usp=sharing
 
 ## Screenshots
 
