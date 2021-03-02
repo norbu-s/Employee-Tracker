@@ -1,16 +1,7 @@
 const mysql = require("mysql");
 const inquirer = require("inquirer");
 const cTable = require("console.table");
-
-
-// create the connection information for the sql database
-const connection = mysql.createConnection({
-  host: "localhost",
-  port: 3306,
-  user: "root",
-  password: "yourRootPassword",
-  database: "employee_db",
-});
+const connection = require('./DB/connection');
 
 const mainPrompt = () => {
   // prompt for info about the item being put up for auction
@@ -27,8 +18,6 @@ const mainPrompt = () => {
         "View all role",
         "View all employees",
         "Update an employees role",
-        "Update an employees manager",
-        "View employees by manager",
         "Exit"
       ],
     })
@@ -55,13 +44,6 @@ const mainPrompt = () => {
         case "Update an employees role":
           updateRole();
           break;
-        case "Update an employees role":
-          viewEmployeeByManager();
-          break;
-        case "View employees by manager":
-          viewEmployeeByManager();
-          break;
-  
         case 'Exit':
             connection.end();
             break;
@@ -90,7 +72,6 @@ const viewAllRole = () => {
   connection.query("SELECT r.id, title, salary, name AS department FROM role r LEFT JOIN department d ON department_id = d.id", (err, res) => {
     if (err) throw err;
     console.table(res);
-    console.log("===================MAIN MENU==================");
 mainPrompt();
   });
 };
@@ -100,7 +81,6 @@ const viewAllEmployee = () => {
   const query = connection.query('SELECT e.id, e.first_name AS First_Name, e.last_name AS Last_Name, title AS Title, salary AS Salary, name AS Department, CONCAT(m.first_name, " ", m.last_name) AS Manager FROM employee e LEFT JOIN employee m ON e.manager_id = m.id INNER JOIN role r ON e.role_id = r.id INNER JOIN department d ON r.department_id = d.id', (err, res) => {
     if (err) throw err;
     console.table(res);
-    console.log("===================MAIN MENU==================");
 mainPrompt();
   });
 };
@@ -125,17 +105,14 @@ const addDepartment = () => {
         (err, res) => {
           if (err) throw err;
           console.log(`${answer.newDepartment} new Department created!\n`);
-          console.log("===================MAIN MENU==================");
           mainPrompt();
         }
       );
     });
 };
 
-//Add role
-async function addRole() {
-  inquirer
-    .prompt([
+//Add Role
+  const newRole = inquirer.prompt([
       {
         name: "newTitle",
         type: "input",
@@ -147,10 +124,10 @@ async function addRole() {
         message: "What is the salary for this role",
       },
       {
-        name: "department",
+        name: "departmentId",
         type: "list",
         message: "Which department does this role belong to?",
-        choices: "department"
+        choices: ["1","2","3","4","5"]
       },
     ])
     .then((answer) => {
@@ -160,18 +137,16 @@ async function addRole() {
         {
           title: `${answer.newTitle}`,
           salary: `${answer.newSalary}`,
-          department: `${answer.department}`,
+          department: `${answer.department_id}`,
         },
         (err, res) => {
           if (err) throw err;
-          console.table(`${answer.newTitle} new Role created for ${answer.dept}!\n`);
+          console.table(`${answer.newTitle} new Role created for ${answer.department_id}!\n`);
           console.log("===================MAIN MENU==================");
           mainPrompt();
         }
       );
     });
-};
-
 
 // //function to add employees
 async function addEmployee() {
@@ -209,29 +184,33 @@ async function addEmployee() {
 
 //Function to update employee roles.
 async function updateRole() {
-  inquirer
-    .prompt([
-      // viewAllEmployee(),
+    inquirer.prompt([
       {
         name: "employeeName",
         type: "list",
         message: "Select the employee to update the role",
-        choices:
-         employee.map(obj =>obj.name)
+        choices: [
+          "John Done",
+          "John doe",
+          "Jane best",
+          "James Martin",
+          "James West",
+          "Vincent Ng",
+          "Eric Junior", 
+          "Melanie Walsh", 
+          "Mark Levy",  
+        ]
       },
       {
         name: "newRoleId",
         type: "list",
         message: "Select the employee to update the role",
-        choices: [
-
-        ]
-      
+        choices: ["1","2","3","4","5"]
       },
     ])
     .then((answer) => {
       const query = connection.query(
-        'UPDATE role SET ? WHERE ?',
+        "UPDATE `employee SET role_id =? whereid=?",
         [roleId,employeeID],
         {
           title: `${answer.newRoleId}`
@@ -245,11 +224,5 @@ async function updateRole() {
     });
 };
 console.log("===================MAIN MENU==================");
-
-
-connection.connect((err) => {
-  if (err) throw err;
-  console.log(`connected as id ${connection.threadId}`);
-});
 
 mainPrompt();
