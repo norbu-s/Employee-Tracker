@@ -1,3 +1,5 @@
+USE employee_db;
+
 INSERT INTO department (name)
 VALUES ("Humanresource");
 
@@ -14,7 +16,9 @@ INSERT INTO department (name)
 VALUES ("Back Office");
 
 
-INSERT INTO role (title,salary,department_id)
+USE employee_db;
+
+INSERT INTO role (title,salary,department_id) 
 VALUES("manager", 130000,1);
 
 INSERT INTO role (title,salary,department_id)

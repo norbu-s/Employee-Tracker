@@ -1,6 +1,6 @@
-Drop database if exists employeedb;
+Drop database if exists employee_db;
 
-create database employeedb;
+create database employee_db;
 
 create table department (
 	id INT not null auto_increment,
@@ -9,7 +9,7 @@ create table department (
     );
     
     
-create table role(
+create table role (
 	id INT not null auto_increment,
 	title  VARCHAR(30) not null,
 	salary decimal(10,2) not null,
